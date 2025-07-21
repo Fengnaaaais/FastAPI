@@ -12,16 +12,15 @@ class DatabaseHelper:
     def __init__(
         self,
         url: str,
-        echo=settings.db.,
+        echo=settings.db.echo,
         echo_pull=settings.db.echo_pull,
-        poll_size=settings.db.poll_sizesettings,
+        poll_size=settings.db.poll_size,
         max_overflow=settings.db.max_overflow,
     ):
         self.engine: AsyncEngine = create_async_engine(
             url=url,
             echo=echo,
-            echo_pull=echo_pull,
-            poll_size=poll_size,
+            pool_size=poll_size,
             max_overflow=max_overflow
         )
         self.session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
@@ -34,7 +33,7 @@ class DatabaseHelper:
         await self.engine.dispose()
 
     async def session_getter(self):
-        async with session_factory() as session:
+        async with self.session_factory() as session:
             yield session
 
 
